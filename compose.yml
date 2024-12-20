@@ -1,0 +1,55 @@
+services:
+  caddy:
+    image: docker.io/lucaslorentz/caddy-docker-proxy:2.9-alpine
+    container_name: caddystack_web
+    ports:
+      - 80:80
+      - 443:443
+    environment:
+      - CADDY_INGRESS_NETWORKS=caddystack
+    networks:
+      - caddystack
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - caddy_data:/data
+    restart: unless-stopped
+  mailpit:
+    image: docker.io/axllent/mailpit
+    container_name: caddystack_mailpit
+    restart: unless-stopped
+    volumes:
+      - mailpit_data:/data
+    ports:
+      # - 8025:8025
+      - 1025:1025
+    environment:
+      MP_MAX_MESSAGES: 5000
+      MP_DATABASE: /data/mailpit.db
+      MP_SMTP_AUTH_ACCEPT_ANY: 1
+      MP_SMTP_AUTH_ALLOW_INSECURE: 1
+    networks:
+      - caddystack
+    labels:
+      caddy: http://mailpit.internal
+      caddy.reverse_proxy: "{{upstreams 8025}}"
+  coredns:
+    image: docker.io/coredns/coredns:1.12.0
+    container_name: caddystack_dns
+    restart: unless-stopped
+    # expose:
+    #   - '53'
+    #   - '53/udp'
+    ports:
+      - '1053:53'
+      - '1053:53/udp'
+    volumes:
+      - './config:/etc/coredns'
+    command: -conf /etc/coredns/Corefile
+# Be sure to `docker network create caddystack`.
+networks:
+  caddystack:
+    external: true
+
+volumes:
+  caddy_data: {}
+  mailpit_data: {}

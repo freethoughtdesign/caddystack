@@ -1,0 +1,13 @@
+test {
+  template IN ANY  {
+      answer "{{ .Name }} 0 IN A 127.0.0.1"
+  }
+  log
+}
+
+internal {
+  template IN ANY  {
+      answer "{{ .Name }} 0 IN A 127.0.0.1"
+  }
+  log
+}
