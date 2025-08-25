@@ -77,3 +77,39 @@ Restart `systemd-resolved`:
 ```
 sudo systemctl restart systemd-resolved
 ```
+
+#### Add a resolver to `systemd-resolved` (macOS)
+
+Ensure that the `/etc/resolver` directory exists. If not:
+
+```
+sudo mkdir /etc/resolver
+```
+
+Make and populate a resolver file for each development domain:
+
+```
+sudo touch /etc/resolver/test && sudo echo "nameserver 127.0.0.1" | sudo tee /etc/resolver/test
+```
+
+```
+sudo touch /etc/resolver/internal && sudo echo "nameserver 127.0.0.1" | sudo tee /etc/resolver/internal
+```
+
+Run `sudo killall -HUP mDNSResponder` to flush the local DNS cache.
+
+Run `scutil --dns` to verify that the new resolvers are working. You should see something like the following in the output:
+
+```
+resolver #8
+  domain   : test
+  nameserver[0] : 127.0.0.1
+  flags    : Request A records, Request AAAA records
+  reach    : 0x00030002 (Reachable,Local Address,Directly Reachable Address)
+
+resolver #9
+  domain   : internal
+  nameserver[0] : 127.0.0.1
+  flags    : Request A records, Request AAAA records
+  reach    : 0x00030002 (Reachable,Local Address,Directly Reachable Address)
+```
