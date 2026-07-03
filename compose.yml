@@ -1,6 +1,6 @@
 services:
   caddy:
-    image: docker.io/lucaslorentz/caddy-docker-proxy:2.9-alpine
+    image: docker.io/lucaslorentz/caddy-docker-proxy:2.13-alpine
     container_name: caddystack_web
     ports:
       - 80:80
